@@ -10,24 +10,33 @@
     <div class="wrapper" id="wrapper">
       <div class="interface" id="interface">
         <div class="controls" id="controls">
-          <button type="button" class="resetBtn" id="resetBtn">reset</button>
-          <div class="scoreCont">
-            <div class="score" id="score">
-              <span class="playerName" id="p1Name">X</span>:<span
-                class="score"
-                id="p1Score"
-                >0</span
-              >
-              <span class="playerName" id="p2Name">O:</span>:<span
-                class="score"
-                id="p2Score"
-                >0</span
-              >
+          <button type="button" class="btns" id="start">start</button>
+          <button type="button" class="btns" id="reset">reset</button>
+
+          <label for="change-name-p1">
+            Enter name for player X:
+            <input type="text" id="change-name-p1" />
+          </label>
+          <label for="change-name-p2">
+            Enter name for player O:
+            <input type="text" id="change-name-p2" />
+          </label>
+
+          <div class="scoresCont">
+            <div class="player">
+              <span class="playerName" id="playerXName">Player X</span>:
+              <span class="score" id="playerXScore">0</span>
+            </div>
+            <div class="player">
+              <span class="playerName" id="playerOName">Player O</span>:
+              <span class="score" id="playerOScore">0</span>
             </div>
           </div>
         </div>
         <div class="display" id="display">
-          This is were turn mssg, and winner message go.
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Obcaecati
+          iusto sint nulla impedit maxime laudantium, provident illo cum esse,
+          nobis eveniet necessitatibus quasi corrupti voluptate ipsa dolorum. s
         </div>
       </div>
 
@@ -43,6 +52,7 @@
         <div class="board-box" data-index="8"></div>
       </div>
     </div>
+
     <script src="app.js"></script>
   </body>
 </html>

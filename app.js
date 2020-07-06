@@ -1,8 +1,11 @@
 //what are best practices for module pattern, mvc, organising of logic?
 //needed to create board, and board state
 const board = (function () {
+  //could i have made an array of element references to work with instead?
   const boardArr = [];
-  const boardRowIndexes = [
+
+  //if any set of below indexes(on boardArr) have 3 of same char, a player has won.
+  const winRowIndexes = [
     [0, 1, 2],
     [3, 4, 5],
     [6, 7, 8],
@@ -13,26 +16,31 @@ const board = (function () {
     [2, 4, 6],
   ];
 
-  //returns string of board row vals
-  const getRowVals = (ind1, ind2, ind3) => {
-    return `${boardArr[ind1]}${boardArr[ind2]}${boardArr[ind3]}`;
-  };
+  //returns string of board row marks or undefined
+  const getRowMarks = (ind1, ind2, ind3) =>
+    `${boardArr[ind1]}${boardArr[ind2]}${boardArr[ind3]}`;
 
   //check for winning pattern on board
-  const _checkForWin = () => {
-    const rowMarks = boardRowIndexes.map((row) => getRowVals(...row));
+  const _checkForWinOrDraw = () => {
+    const winVals = winRowIndexes
+      .map((row) => getRowMarks(...row))
+      .reduce((result, rowMarks, idx) => {
+        return (result =
+          rowMarks === "XXX"
+            ? [player1.getName(), [...winRowIndexes[idx]]] //indexes used to select 3 win board elems in dom
+            : rowMarks === "OOO"
+            ? [player2.getName(), [...winRowIndexes[idx]]]
+            : result);
+      }, []);
 
-    for (let i = 0; i < rowMarks.length; i++) {
-      const marks = rowMarks[i];
-      if (marks === "XXX") {
-        control.declareWinner(player1.getName(), i);
-      } else if (marks === "OOO") {
-        control.declareWinner(player2.getName(), i);
-      } else if (boardArr.length === 9 && !boardArr.includes(undefined)) {
-        control.declareDraw();
-      }
+    if (winVals[0]) {
+      control.showWinner(...winVals);
+      return;
     }
-    console.log(boardArr, boardArr.length, boardArr[1]);
+
+    if (boardArr.length === 9 && !boardArr.includes(undefined)) {
+      control.declareDraw();
+    }
   };
 
   //add mark to board at specified index
@@ -42,31 +50,57 @@ const board = (function () {
     if (!boardArr[index]) {
       boardArr[index] = mark;
       control.renderMarks(boardArr);
-      _checkForWin();
+      _checkForWinOrDraw();
     }
   };
 
   return { addToBoardArr };
 })();
 
-//needed for game control
+//needed for game control/////
 const control = (function () {
   const _domBoard = document.querySelectorAll("#board-grid div");
+  const mssgDisplay = document.querySelector("#display");
+  const reset = document.querySelector("#reset");
+  const p1Score = document.querySelector("#playerXScore");
+  const p2Score = document.querySelector("#playerOScore");
+
   let _isPlayer1Turn = true;
 
   //render marks to appropriate spaces on board when boardArr changes
   const renderMarks = (boardArr) => {
-    _domBoard.forEach((sqr, index) => {
-      sqr.textContent = boardArr[index];
+    _domBoard.forEach((boardSqr, index) => {
+      boardSqr.textContent = boardArr[index];
     });
   };
 
-  const declareWinner = (name) => {
-    console.log(name + " is the winner");
+  const showWinner = (name, index) => {
+    mssgDisplay.textContent = `${name} is the winner!`;
+    _lightWinRow(index);
+    _updateScore(name);
   };
 
   const declareDraw = () => {
-    console.log("Games a draw");
+    mssgDisplay.textContent = "Sorry, this game was a draw!";
+  };
+
+  //if el dataset is in indexes, el is win sqr, should be lit up
+  const _lightWinRow = (indexes) => {
+    _domBoard.forEach((boardSqr) => {
+      if (indexes.includes(parseInt(boardSqr.dataset.index))) {
+        boardSqr.classList.add("lightWinSqrs");
+      }
+    });
+  };
+
+  const _updateScore = (name) => {
+    if (player1.getName() === name) {
+      player1.addToScore();
+      p1Score.textContent = player1.getScore();
+    } else {
+      player2.addToScore();
+      p2Score.textContent = player2.getScore();
+    }
   };
 
   //eventlisteners
@@ -79,7 +113,10 @@ const control = (function () {
       _isPlayer1Turn = _isPlayer1Turn ? false : true;
     }
   });
-  return { renderMarks, declareWinner, declareDraw };
+
+  reset.addEventListener("click", () => location.reload());
+
+  return { renderMarks, showWinner, declareDraw };
 })();
 
 //needed to build players
@@ -111,8 +148,9 @@ const playerFactory = (name, mark) => {
   return { changeName, getName, addToScore, getScore, getMark };
 };
 
-const player1 = playerFactory("X", "X");
-const player2 = playerFactory("O", "O");
+const player1 = playerFactory("Player X", "X");
+const player2 = playerFactory("Player O", "O");
 
 //the functs have the closure, need to pass values into functs with closure, and can assign to vars in the
 //closure.
+//how to stop players from playing after win? Remove eventlistenr?

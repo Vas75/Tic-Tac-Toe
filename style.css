@@ -50,17 +50,37 @@ body {
 }
 
 .interface {
-  background-color: darkgrey;
-  width: 30%;
-  margin-right: 10px;
-  color: #fff;
+  width: 35%;
+  margin: 10px;
+  font-size: 1.5rem;
 }
 
 .controls {
-  background-color: purple;
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
   align-items: center;
+  height: 50%;
+  padding: 10px;
+  background-color: #000;
+  color: #fff;
+}
+
+.display {
+  display: flex;
+  height: 50%;
+  padding: 10px;
+  border: 5px solid black;
+  background-color: #fff;
+  color: #000;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 5px 0;
 }
 
 .board-grid {
@@ -68,6 +88,7 @@ body {
   grid-template-columns: 1fr 1fr 1fr;
   grid-template-rows: 1fr 1fr 1fr;
   gap: 10px;
+  border: 10px solid #fff;
   width: 100%;
   height: 100%;
   margin: auto;
@@ -82,6 +103,7 @@ body {
   font-size: 10rem;
 }
 
-.display {
-  background-color: red;
+.lightWinSqrs {
+  color: gold;
+  outline: 5px solid gold;
 }
