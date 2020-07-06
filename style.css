@@ -83,6 +83,36 @@ label {
   margin: 5px 0;
 }
 
+input:hover,
+button:hover {
+  cursor: pointer;
+}
+
+button {
+  background-color: #fff;
+  font-size: 1.1rem;
+  outline: none;
+}
+
+button:active {
+  transform: scale(0.9);
+}
+
+.control-btns-cont {
+  display: flex;
+  width: 100%;
+  justify-content: space-around;
+}
+
+.control-btns-cont > button {
+  width: 25%;
+}
+
+input {
+  width: 100%;
+  font-size: inherit;
+}
+
 .board-grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -101,6 +131,12 @@ label {
   justify-content: center;
   align-items: center;
   font-size: 10rem;
+}
+
+.scores-cont {
+  display: flex;
+  justify-content: space-evenly;
+  width: 100%;
 }
 
 .lightWinSqrs {

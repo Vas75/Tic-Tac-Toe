@@ -2,7 +2,7 @@
 //needed to create board, and board state
 const board = (function () {
   //could i have made an array of element references to work with instead?
-  const boardArr = [];
+  let boardArr = [];
 
   //if any set of below indexes(on boardArr) have 3 of same char, a player has won.
   const winRowIndexes = [
@@ -43,7 +43,7 @@ const board = (function () {
     }
   };
 
-  //add mark to board at specified index
+  //add mark to board at specified index, player1Turn true, add X, else O.
   const addToBoardArr = (index, isPlayer1Turn) => {
     const mark = isPlayer1Turn ? player1.getMark() : player2.getMark();
 
@@ -54,13 +54,19 @@ const board = (function () {
     }
   };
 
-  return { addToBoardArr };
+  const clearBoardArr = () => {
+    boardArr = [];
+  };
+
+  return { addToBoardArr, clearBoardArr };
 })();
 
 //needed for game control/////
 const control = (function () {
+  const boardGrid = document.querySelector("#board-grid");
   const _domBoard = document.querySelectorAll("#board-grid div");
   const mssgDisplay = document.querySelector("#display");
+  const play = document.querySelector("#play");
   const reset = document.querySelector("#reset");
   const p1Score = document.querySelector("#playerXScore");
   const p2Score = document.querySelector("#playerOScore");
@@ -74,14 +80,28 @@ const control = (function () {
     });
   };
 
+  const _clearBoard = () => {
+    _domBoard.forEach((boardSqr) => {
+      boardSqr.textContent = "";
+      boardSqr.classList.remove("lightWinSqrs");
+    });
+    board.clearBoardArr();
+    _displayMssg("");
+  };
+
+  const _displayMssg = (mssg) => {
+    mssgDisplay.textContent = mssg;
+  };
+
   const showWinner = (name, index) => {
-    mssgDisplay.textContent = `${name} is the winner!`;
+    _displayMssg(`${name} is the winner! Hit play to continue!`);
+    _stopPlay();
     _lightWinRow(index);
     _updateScore(name);
   };
 
   const declareDraw = () => {
-    mssgDisplay.textContent = "Sorry, this game was a draw!";
+    _displayMssg("Sorry, this game was a draw!");
   };
 
   //if el dataset is in indexes, el is win sqr, should be lit up
@@ -103,8 +123,7 @@ const control = (function () {
     }
   };
 
-  //eventlisteners
-  document.querySelector("#board-grid").addEventListener("click", (e) => {
+  const _handleGridClickEvent = (e) => {
     const el = e.target;
     if (el.classList.contains("board-box") && !el.textContent) {
       const index = el.dataset.index;
@@ -112,9 +131,20 @@ const control = (function () {
 
       _isPlayer1Turn = _isPlayer1Turn ? false : true;
     }
-  });
+  };
 
+  const _stopPlay = () => {
+    boardGrid.removeEventListener("click", _handleGridClickEvent);
+  };
+
+  const _startPlay = () => {
+    boardGrid.addEventListener("click", _handleGridClickEvent);
+    _clearBoard();
+  };
+
+  //eventlisteners
   reset.addEventListener("click", () => location.reload());
+  play.addEventListener("click", _startPlay);
 
   return { renderMarks, showWinner, declareDraw };
 })();
@@ -122,7 +152,6 @@ const control = (function () {
 //needed to build players
 const playerFactory = (name, mark) => {
   let _playerName = name;
-
   let _playerScore = 0;
 
   const changeName = (newName) => {
