@@ -68,6 +68,10 @@ const control = (function () {
   const mssgDisplay = document.querySelector("#display");
   const play = document.querySelector("#play");
   const reset = document.querySelector("#reset");
+  const p1NameInp = document.querySelector("#change-name-p1");
+  const p2NameInp = document.querySelector("#change-name-p2");
+  const p1NameDiv = document.querySelector("#playerXName");
+  const p2NameDiv = document.querySelector("#playerOName");
   const p1Score = document.querySelector("#playerXScore");
   const p2Score = document.querySelector("#playerOScore");
 
@@ -142,9 +146,22 @@ const control = (function () {
     _clearBoard();
   };
 
+  const _changeDisplayedName = (e, player, nameDiv) => {
+    player.changeName(e.target.value);
+    nameDiv.textContent = player.getName();
+  };
+
   //eventlisteners
   reset.addEventListener("click", () => location.reload());
   play.addEventListener("click", _startPlay);
+
+  p1NameInp.addEventListener("input", (e) =>
+    _changeDisplayedName(e, player1, p1NameDiv)
+  );
+
+  p2NameInp.addEventListener("input", (e) =>
+    _changeDisplayedName(e, player2, p2NameDiv)
+  );
 
   return { renderMarks, showWinner, declareDraw };
 })();

@@ -90,6 +90,7 @@ button:hover {
 
 button {
   background-color: #fff;
+  margin-top: 5px;
   font-size: 1.1rem;
   outline: none;
 }
@@ -110,7 +111,7 @@ button:active {
 
 input {
   width: 100%;
-  font-size: inherit;
+  font-size: 1.1rem;
 }
 
 .board-grid {
