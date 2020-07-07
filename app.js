@@ -54,11 +54,24 @@ const board = (function () {
     }
   };
 
+  const getBoardArrCopy = () => {
+    return [...boardArr];
+  };
+
   const clearBoardArr = () => {
     boardArr = [];
   };
 
-  return { addToBoardArr, clearBoardArr };
+  return { addToBoardArr, clearBoardArr, getBoardArrCopy };
+})();
+
+//handles AI logic///
+const AI = (function () {
+  //return an index an the mark(O), index cant beselected already,call for copy of the array?
+  const getAIPick = (boardArrCopy) => {
+    return boardArrCopy;
+  };
+  return { getAIPick };
 })();
 
 //needed for game control/////
@@ -68,6 +81,7 @@ const control = (function () {
   const mssgDisplay = document.querySelector("#display");
   const play = document.querySelector("#play");
   const reset = document.querySelector("#reset");
+  const aiBtn = document.querySelector("#toggle-AI");
   const p1NameInp = document.querySelector("#change-name-p1");
   const p2NameInp = document.querySelector("#change-name-p2");
   const p1NameDiv = document.querySelector("#playerXName");
@@ -76,6 +90,7 @@ const control = (function () {
   const p2Score = document.querySelector("#playerOScore");
 
   let _isPlayer1Turn = true;
+  let _vsComp = false;
 
   //render marks to appropriate spaces on board when boardArr changes
   const renderMarks = (boardArr) => {
@@ -134,6 +149,13 @@ const control = (function () {
       board.addToBoardArr(index, _isPlayer1Turn);
 
       _isPlayer1Turn = _isPlayer1Turn ? false : true;
+
+      if (_vsComp) {
+        const boardArrCopy = board.getBoardArrCopy();
+        const AIPick = AI.getAIPick(boardArrCopy);
+        console.log(AIPick);
+        _isPlayer1Turn = true; //ai picks, becomes player1 turn again, maybe need to clear board(done below)
+      }
     }
   };
 
@@ -144,11 +166,30 @@ const control = (function () {
   const _startPlay = () => {
     boardGrid.addEventListener("click", _handleGridClickEvent);
     _clearBoard();
+    _displayMssg("Game On!");
   };
 
-  const _changeDisplayedName = (e, player, nameDiv) => {
-    player.changeName(e.target.value);
+  const _changeDisplayedName = (nameDiv, player, e) => {
+    const value = e.target.value ? e.target.value : "?";
+    player.changeName(value);
     nameDiv.textContent = player.getName();
+  };
+
+  const _toggleAI = () => {
+    _vsComp = _vsComp ? false : true;
+    const mssg = _vsComp
+      ? "A.I. is active, press play to begin, good luck!"
+      : "A.I. turned off!";
+    _clearBoard();
+    _zeroOutScores();
+    _displayMssg(mssg);
+  };
+
+  const _zeroOutScores = () => {
+    p1Score.textContent = 0;
+    p2Score.textContent = 0;
+    player1.resetScore();
+    player2.resetScore();
   };
 
   //eventlisteners
@@ -156,17 +197,19 @@ const control = (function () {
   play.addEventListener("click", _startPlay);
 
   p1NameInp.addEventListener("input", (e) =>
-    _changeDisplayedName(e, player1, p1NameDiv)
+    _changeDisplayedName(p1NameDiv, player1, e)
   );
 
   p2NameInp.addEventListener("input", (e) =>
-    _changeDisplayedName(e, player2, p2NameDiv)
+    _changeDisplayedName(p2NameDiv, player2, e)
   );
+
+  aiBtn.addEventListener("click", _toggleAI);
 
   return { renderMarks, showWinner, declareDraw };
 })();
 
-//needed to build players
+//needed to build players(factory function)//
 const playerFactory = (name, mark) => {
   let _playerName = name;
   let _playerScore = 0;
@@ -191,7 +234,11 @@ const playerFactory = (name, mark) => {
     return _playerScore;
   };
 
-  return { changeName, getName, addToScore, getScore, getMark };
+  const resetScore = () => {
+    _playerScore = 0;
+  };
+
+  return { changeName, getName, addToScore, getScore, resetScore, getMark };
 };
 
 const player1 = playerFactory("Player X", "X");

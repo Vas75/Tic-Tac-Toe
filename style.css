@@ -144,3 +144,9 @@ input {
   color: gold;
   outline: 5px solid gold;
 }
+
+@media (max-width: 1000px) {
+  html {
+    font-size: 13px;
+  }
+}
