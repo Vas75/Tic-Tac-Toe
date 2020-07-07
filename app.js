@@ -163,7 +163,9 @@ const control = (function () {
     boardGrid.removeEventListener("click", _handleGridClickEvent);
   };
 
+  //here, trying to make player1 go first each time, so p1Turn true on start btn click
   const _startPlay = () => {
+    _isPlayer1Turn = true;
     boardGrid.addEventListener("click", _handleGridClickEvent);
     _clearBoard();
     _displayMssg("Game On!");
@@ -176,10 +178,12 @@ const control = (function () {
   };
 
   const _toggleAI = () => {
+    _isPlayer1Turn = true;
     _vsComp = _vsComp ? false : true;
     const mssg = _vsComp
       ? "A.I. is active, press play to begin, good luck!"
-      : "A.I. turned off!";
+      : "A.I. turned off, press play to start PvP match!";
+    _stopPlay();
     _clearBoard();
     _zeroOutScores();
     _displayMssg(mssg);
@@ -246,4 +250,6 @@ const player2 = playerFactory("Player O", "O");
 
 //the functs have the closure, need to pass values into functs with closure, and can assign to vars in the
 //closure.
-//how to stop players from playing after win? Remove eventlistenr?
+//need to get ai up and running, if vsComp true, get pick from AI object logic
+
+//Scrap whole app? Make better use of factory function, player1turn true,
