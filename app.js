@@ -35,6 +35,7 @@ const board = (function () {
 
     if (winVals[0]) {
       control.showWinner(...winVals);
+      control.changeAIGameOn(false);
       return;
     }
 
@@ -69,8 +70,22 @@ const board = (function () {
 const AI = (function () {
   //return an index an the mark(O), index cant beselected already,call for copy of the array?
   const getAIPick = (boardArrCopy) => {
-    return boardArrCopy;
+    const getRandNum = () => {
+      return Math.floor(Math.random() * 9);
+    };
+
+    let bool = true;
+    let randNum;
+    while (bool) {
+      randNum = getRandNum();
+
+      if (!boardArrCopy[randNum]) {
+        bool = false;
+      }
+    }
+    return randNum;
   };
+
   return { getAIPick };
 })();
 
@@ -91,6 +106,7 @@ const control = (function () {
 
   let _isPlayer1Turn = true;
   let _vsComp = false;
+  let aiGameOn = true;
 
   //render marks to appropriate spaces on board when boardArr changes
   const renderMarks = (boardArr) => {
@@ -147,14 +163,18 @@ const control = (function () {
     if (el.classList.contains("board-box") && !el.textContent) {
       const index = el.dataset.index;
       board.addToBoardArr(index, _isPlayer1Turn);
-
       _isPlayer1Turn = _isPlayer1Turn ? false : true;
 
-      if (_vsComp) {
+      //below get ai index pick if game is set to Player vs A.I.
+      if (_vsComp && aiGameOn) {
         const boardArrCopy = board.getBoardArrCopy();
-        const AIPick = AI.getAIPick(boardArrCopy);
-        console.log(AIPick);
-        _isPlayer1Turn = true; //ai picks, becomes player1 turn again, maybe need to clear board(done below)
+
+        if (boardArrCopy.length < 9 || boardArrCopy.includes(undefined)) {
+          const AIPick = AI.getAIPick(boardArrCopy);
+          board.addToBoardArr(AIPick, false);
+          _isPlayer1Turn = true;
+        }
+        //ai picks, becomes player1 turn again
       }
     }
   };
@@ -166,6 +186,7 @@ const control = (function () {
   //here, trying to make player1 go first each time, so p1Turn true on start btn click
   const _startPlay = () => {
     _isPlayer1Turn = true;
+    changeAIGameOn(true);
     boardGrid.addEventListener("click", _handleGridClickEvent);
     _clearBoard();
     _displayMssg("Game On!");
@@ -189,6 +210,10 @@ const control = (function () {
     _displayMssg(mssg);
   };
 
+  const changeAIGameOn = (bool) => {
+    aiGameOn = bool;
+  };
+
   const _zeroOutScores = () => {
     p1Score.textContent = 0;
     p2Score.textContent = 0;
@@ -210,7 +235,7 @@ const control = (function () {
 
   aiBtn.addEventListener("click", _toggleAI);
 
-  return { renderMarks, showWinner, declareDraw };
+  return { renderMarks, showWinner, declareDraw, changeAIGameOn };
 })();
 
 //needed to build players(factory function)//
@@ -252,4 +277,9 @@ const player2 = playerFactory("Player O", "O");
 //closure.
 //need to get ai up and running, if vsComp true, get pick from AI object logic
 
-//Scrap whole app? Make better use of factory function, player1turn true,
+//Scrap whole app? Make better use of factory function, player1turn true, player obj interacts better with controller,
+//maybe references to elements on the board array, interact with dom easier? AI could plug in easier? How?
+//How to pick rand num on array of with no length, and no idea where elements are?
+
+//pick randon number betweeen 0-8, need a function to do this, if board Array has val at this index,
+//call funct again to pick again, else place val (comps O) on array.
