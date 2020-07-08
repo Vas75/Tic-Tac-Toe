@@ -1,4 +1,5 @@
 //what are best practices for module pattern, mvc, organising of logic?
+
 //needed to create board, and board state
 const board = (function () {
   //could i have made an array of element references to work with instead?
@@ -35,7 +36,6 @@ const board = (function () {
 
     if (winVals[0]) {
       control.showWinner(...winVals);
-      control.changeAIGameOn(false);
       return;
     }
 
@@ -68,7 +68,7 @@ const board = (function () {
 
 //handles AI logic///
 const AI = (function () {
-  //return an index an the mark(O), index cant beselected already,call for copy of the array?
+  //return an index an the mark(O), index cant beselected already
   const getAIPick = (boardArrCopy) => {
     const getRandNum = () => {
       return Math.floor(Math.random() * 9);
@@ -139,7 +139,7 @@ const control = (function () {
     _displayMssg("Sorry, this game was a draw!");
   };
 
-  //if el dataset is in indexes, el is win sqr, should be lit up
+  //needed to find elements that should be highlighted
   const _lightWinRow = (indexes) => {
     _domBoard.forEach((boardSqr) => {
       if (indexes.includes(parseInt(boardSqr.dataset.index))) {
@@ -158,6 +158,16 @@ const control = (function () {
     }
   };
 
+  const _startAI = () => {
+    const boardArrCopy = board.getBoardArrCopy();
+
+    if (boardArrCopy.length < 9 || boardArrCopy.includes(undefined)) {
+      const AIPick = AI.getAIPick(boardArrCopy);
+      board.addToBoardArr(AIPick, false); //pass in false, AI always player O.
+      _isPlayer1Turn = true; //AI makes move, then user's turn again.
+    }
+  };
+
   const _handleGridClickEvent = (e) => {
     const el = e.target;
     if (el.classList.contains("board-box") && !el.textContent) {
@@ -165,22 +175,16 @@ const control = (function () {
       board.addToBoardArr(index, _isPlayer1Turn);
       _isPlayer1Turn = _isPlayer1Turn ? false : true;
 
-      //below get ai index pick if game is set to Player vs A.I.
+      //if user playing against computer, below will trigger AI to play rather than 2nd player.
       if (_vsComp && aiGameOn) {
-        const boardArrCopy = board.getBoardArrCopy();
-
-        if (boardArrCopy.length < 9 || boardArrCopy.includes(undefined)) {
-          const AIPick = AI.getAIPick(boardArrCopy);
-          board.addToBoardArr(AIPick, false);
-          _isPlayer1Turn = true;
-        }
-        //ai picks, becomes player1 turn again
+        _startAI();
       }
     }
   };
 
   const _stopPlay = () => {
     boardGrid.removeEventListener("click", _handleGridClickEvent);
+    changeAIGameOn(false);
   };
 
   //here, trying to make player1 go first each time, so p1Turn true on start btn click
@@ -275,11 +279,7 @@ const player2 = playerFactory("Player O", "O");
 
 //the functs have the closure, need to pass values into functs with closure, and can assign to vars in the
 //closure.
-//need to get ai up and running, if vsComp true, get pick from AI object logic
 
 //Scrap whole app? Make better use of factory function, player1turn true, player obj interacts better with controller,
 //maybe references to elements on the board array, interact with dom easier? AI could plug in easier? How?
 //How to pick rand num on array of with no length, and no idea where elements are?
-
-//pick randon number betweeen 0-8, need a function to do this, if board Array has val at this index,
-//call funct again to pick again, else place val (comps O) on array.
